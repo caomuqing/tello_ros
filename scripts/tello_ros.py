@@ -10,6 +10,9 @@ from std_msgs.msg import Bool
 from geometry_msgs.msg import Vector3
 
 speed = 100
+speed_mid=50
+speed_slow=25
+
 tello1_address = ('192.168.1.101', 8889)
 tello2_address = ('192.168.1.102', 8889)
 tello3_address = ('192.168.1.103', 8889)
@@ -40,13 +43,39 @@ def takeoff_cb(data):
 		sendAll("takeoff", 0)
 
 def command1_cb(data):
-	send101("go "+str(int(data.x*100))+" "+str(int(data.y*100))+" "+str(int(data.z*100))+" "+str(speed), 0)
+	commandy=int(data.y*100)
+	if commandy==0:
+		send101("go "+str(int(data.x*100))+" "+str(commandy)+" "+str(int(data.z*100))+" "+str(speed_mid), 0)
+	elif commandy<20 and commandy>-20:
+		if commandy>0:
+			send101("go "+str(int(data.x*100))+" "+str(20)+" "+str(int(data.z*100))+" "+str(speed_slow), commandy/10)
+		else:
+			send101("go "+str(int(data.x*100))+" "+str(-20)+" "+str(int(data.z*100))+" "+str(speed_slow), commandy/10)
+		send101("stop", 0)
+	else:
+		send101("go "+str(int(data.x*100))+" "+str(commandy)+" "+str(int(data.z*100))+" "+str(40+(commandy-20)*3), 0)
 
 def command2_cb(data):
-	send102("go "+str(int(data.x*100))+" "+str(int(data.y*100))+" "+str(int(data.z*100))+" "+str(speed), 0)
+	commandy=int(data.y*100)
+	# if commandy<20 and commandy>-20:
+	# 	if commandy>0:
+	# 		send102("go "+str(int(data.x*100))+" "+str(20)+" "+str(int(data.z*100))+" "+str(speed), commandy/10)
+	# 	else:
+	# 		send102("go "+str(int(data.x*100))+" "+str(-20)+" "+str(int(data.z*100))+" "+str(speed), commandy/10)		
+	# 	send102("stop", 0)
+	# else:
+	send102("go "+str(int(data.x*100))+" "+str(commandy)+" "+str(int(data.z*100))+" "+str(speed), 0)
 
 def command3_cb(data):
-	send103("go "+str(int(data.x*100))+" "+str(int(data.y*100))+" "+str(int(data.z*100))+" "+str(speed), 0)
+	commandy=int(data.y*100)
+	# if commandy<20 and commandy>-20:
+	# 	if commandy>0:
+	# 		send103("go "+str(int(data.x*100))+" "+str(20)+" "+str(int(data.z*100))+" "+str(speed), commandy/10)
+	# 	else:
+	# 		send103("go "+str(int(data.x*100))+" "+str(-20)+" "+str(int(data.z*100))+" "+str(speed), commandy/10)
+	# 	send103("stop", 0)
+	# else:
+	send103("go "+str(int(data.x*100))+" "+str(commandy)+" "+str(int(data.z*100))+" "+str(speed), 0)
 
 def receive():
 	# Continuously loop and listen for incoming messages
@@ -170,7 +199,7 @@ def main():
 	# Put Tello into command mode
 	sendAll("command", 3)
 	#enquireBattery()
-	rospy.Timer(rospy.Duration(2.0), enquireBattery)
+	rospy.Timer(rospy.Duration(10.0), enquireBattery)
 
 	receive101Thread = threading.Thread(target=receive101)
 	receive101Thread.daemon = True

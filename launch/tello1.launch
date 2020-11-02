@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Configuring control package-->
+  <node respawn="false" pkg="tello_ros" type="tello_ros_single.py" name="tello1" output="screen">
+      <param name="uav_id" value="1" />
+<!--       <remap from="/vins_estimator/odometry" to="/NTU_internal/drone_feedback" />      --> 
+  </node>
+
+</launch>
